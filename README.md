@@ -2,9 +2,9 @@
 Group project for COSC 4351
 
 Group members:
-Mohammed Raihan Kapadia
-Stephany Monroy
-Nicholas Moore 
+Mohammed,
+Stephany,
+Nicholas
 
 Project:
 Website for group 4 project in cosc 4351
