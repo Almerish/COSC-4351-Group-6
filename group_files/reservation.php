@@ -124,6 +124,7 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
             <div class="form-group">
                 <button type="submit" name="reserv-submit" class="btn btn-dark btn-lg btn-block">Submit Reservation</button>
             </div>
+            <p> Choose the table <a href="table.php">choose your table</a></p>
             </form>
             <br><br>
         </div>
