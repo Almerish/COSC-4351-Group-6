@@ -1,5 +1,80 @@
 <?php
 
+/*
+
+CREATE TABLE users (
+	preferred_diner_id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	mailing_address TEXT NOT NULL,
+	billing_address TEXT NOT NULL,
+	points INTEGER NOT NULL,
+	payment_method TEXT NOT NULL,
+	email TEXT NOT NULL,
+	username TEXT NOT NULL,
+	password TEXT NOT NULL
+);
+
+CREATE TABLE reservations (
+	reservation_id INTEGER PRIMARY KEY,
+	preferred_diner_id INTEGER NOT NULL,
+	date TEXT NOT NULL,
+	time TEXT NOT NULL,
+	name TEXT NOT NULL,
+	phone_num TEXT NOT NULL,
+	email TEXT NOT NULL,
+	num_of_guests INTEGER NOT NULL,
+	tables TEXT NOT NULL,
+	payment_method TEXT NOT NULL,
+	FOREIGN KEY (preferred_diner_id)
+		REFERENCES users (preferred_diner_id)
+);
+
+CREATE TABLE tables (
+	table_id PRIMARY KEY,
+	num_of_seats INTEGER NOT NULL
+);
+
+CREATE TABLE high_traffic_days (
+	date TEXT PRIMARY KEY,
+	label
+);
+
+INSERT INTO table (column1,column2 ,..)
+VALUES( value1,	value2 ,...);
+
+--Can manualy assign preferred_diner_id or allow the database to auto increment
+
+INSERT INTO users (preferred_diner_id, name, mailing_address, billing_address, points, payment_method, email, username, password)
+VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');
+
+INSERT INTO users (name, mailing_address, billing_address, points, payment_method, email, username, password)
+VALUES ('Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');
+
+INSERT INTO reservations (reservation_id, preferred_diner_id, date, time, name, phone_num, email, num_of_guests, tables, payment_method)
+VALUES ();
+
+INSERT INTO tables (table_id, num_of_seats)
+VALUES ();
+
+INSERT INTO high_traffic_days (date, label)
+VALUES ();
+
+DELETE FROM table
+WHERE search_condition;
+
+DELETE FROM users
+WHERE preferred_diner_id = 1;
+
+UPDATE table
+SET column_1 = new_value_1,
+    column_2 = new_value_2
+WHERE
+    search_condition 
+ORDER column_or_expression
+LIMIT row_count OFFSET offset;
+
+*/
+
 // set the connection for database and php
 
 	class MyDB extends SQLite3 {
