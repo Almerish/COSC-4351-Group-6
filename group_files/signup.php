@@ -21,42 +21,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 
 	else
 	{
-        // Prepare a select statement
-        $sql = "SELECT id FROM users WHERE username = ?";
-        
-        if($stmt = mysqli_prepare($link, $sql))  // prepare sql statement
-		{
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);  // inbuit function
-            
-            // Set parameters
-            $param_username = trim($_POST["username"]);   // trim is inbuilt function remove whitespace
-            
-            // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt))
-			{
-                /* store result */
-                mysqli_stmt_store_result($stmt);
-                
-                if(mysqli_stmt_num_rows($stmt) == 1)
-				{
-                    $username_err = "This username is already taken.";
-                } 
-				
-				else
-				{
-                    $username = trim($_POST["username"]);
-                }
-            } 
-			
-			else
-			{
-                echo "Oops! Something went wrong. Please try again later.";
-            }
-
-            // Close statement
-            mysqli_stmt_close($stmt);
-        }
+		if (doesUserExist(trim($_POST["username"]))) {
+			$username_err = "This username is already taken.";
+		} else {
+			$username = trim($_POST["username"]);
+		}
+		
     }
 
 	// this will be for password
@@ -125,6 +95,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     }
 
 	// eneter data in database is remaining
+	if (empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($mailing_address_err) && empty($billing_address_err) && empty($email_err)) {
+		insertUser($username, $mailing_address, $billing_address, 0, "Credit", $email, $username, $password);
+	}
 }
 ?>
 
