@@ -65,6 +65,34 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
 <!DOCTYPE html>
 <html lang="en">
     <head>
+		<script>
+		function showHint() {
+			var date = document.getElementById("date");
+			var strDate = date.value; <!-- options[e.selectedIndex].text -->
+			if (strDate.length == 0) {
+				document.getElementById("txtSeat").innerHTML = "No date selected";
+				return;
+			} else {
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+				  if (this.readyState == 4 && this.status == 200) {
+					document.getElementById("txtSeat").innerHTML = this.responseText;
+				  }
+				};
+				var time = document.getElementById("time");
+				var strTime = time.options[time.selectedIndex].text;
+				let temp = strTime.split(" ")
+				var strTemp = strDate + " " + temp[0]
+				var numGuests = document.getElementById("num_guests");
+				var strNum = numGuests.value;
+				var strTemp = 13
+				xmlhttp.open("GET", "table.php?q=" + strNum, true);
+				xmlhttp.send();
+			}
+		}
+		</script>
+		
+	
         <br><br>
         <div class="container">
         <h3 class="text-center"><br>New Reservation<br></h3>   
@@ -84,12 +112,12 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
             
             <div class="form-group">
                 <label>Enter Date</label>
-                <input type="date" class="form-control" name="date" placeholder="Date" required="required">
+                <input type="date" class="form-control" name="date" id="date" placeholder="Date" required="required" onchange="showHint()">
             </div>
         
             <div class="form-group">
                 <label>Enter Time Zone</label>
-                <select class="form-control" name="time">
+                <select class="form-control" name="time" id="time" onchange="showHint()">
                 <option>16:00 - 17:00</option>
                 <option>17:00 - 18:00</option>
                 <option>18:00 - 19:00</option>
@@ -98,10 +126,14 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
                 <option>21:00 - 22:00</option>
                 </select>
             </div>
+			
+			<div> 
+				Available Seats: <span id="txtSeat"></span>
+			</div>
         
             <div class="form-group">
                 <label>Enter number of Guests</label>
-                <input type="number" class="form-control" min="1" name="num_guests" placeholder="Guests" required="required">
+                <input type="number" class="form-control" min="1" name="num_guests" id="num_guests" placeholder="Guests" required="required" onchange="showHint()">
                 <small class="form-text text-muted">Minimum value is 1</small>
             </div>
         
