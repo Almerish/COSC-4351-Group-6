@@ -1,6 +1,7 @@
 <?php
 
 require "connection.php";
+session_start();
 
 if(isset($_SESSION['id']))      // we have set id and username to Session variable   //isset will check if the variable is not null
 {
@@ -15,9 +16,6 @@ function between($val, $x, $y)      // function to decide the value is correct o
 
 $all_error = $name_error = $guests_error = $tele_error = $email_error = ""; 
 
-
-session_start();
-
 if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html doc below
 {
             // we can add user id = $session['id] but i have to check how it work
@@ -28,11 +26,7 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
     $tele = $_POST['tele'];
     $email = $_POST['email'];
     
-    if($guests==1 || $guests==2)
-    {
-        // figure out how to arrange tables and wether we give them post variable or not
-    }
-
+  
     if(empty($name) || empty($date) || empty($time) || empty($guests) || empty($tele) ||empty($email))
     {
         $all_error = "fields cannot be empty";
@@ -59,6 +53,50 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
     }
     
 }
+
+if(array_key_exists('date', $_POST)) 
+{
+  check($_POST['date']);
+}
+function check($date)
+{
+  $db = new MyDB();
+        if (!$db) {
+          echo $db -> lastErrorMsg();
+        }
+
+        $statement = $db->prepare("SELECT date FROM high_traffic_days WHERE date = :date");
+
+        $statement->bindValue(":date", $date);    // values selecetd at reservation
+        $result = $statement->execute();
+    
+        if (emptyResult($result)) {
+			
+			$name = $_POST['name'];
+			$date = $_POST['date'];
+			$time= $_POST['time'];
+			$guests= $_POST['num_guests'];
+			$tele = $_POST['tele'];
+			$email = $_POST['email'];
+			
+			insertReservation(0, $date, $time, $name, $tele, $email, intval($guests), "", "Cash");
+          header("Location:index.php");
+
+          $var = "0";       //var stores the value but how to link it still not get it
+          $_SESSION["var2"] = $var;
+          echo $var;                  
+        } 
+        else 
+        {
+          header("Location:hightraffic.php");
+
+          $var = "1";  //high traffic 
+          $_SESSION["var2"] = $var;
+          echo $var;
+        }
+        $db->close();
+}
+
 ?>
 
 
@@ -68,7 +106,7 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
 		<script>
 		function showHint() {
 			var date = document.getElementById("date");
-			var strDate = date.value; <!-- options[e.selectedIndex].text -->
+			var strDate = date.value; <!-- options[e.selectedIndex].text -->  // pulls the value selected in text
 			if (strDate.length == 0) {
 				document.getElementById("txtSeat").innerHTML = "No date selected";
 				return;
@@ -76,89 +114,170 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
 				var xmlhttp = new XMLHttpRequest();
 				xmlhttp.onreadystatechange = function() {
 				  if (this.readyState == 4 && this.status == 200) {
-					document.getElementById("txtSeat").innerHTML = this.responseText;
+					document.getElementById("txtSeat").innerHTML = this.responseText;   // echo will store in txtseat
 				  }
 				};
 				var time = document.getElementById("time");
 				var strTime = time.options[time.selectedIndex].text;
 				let temp = strTime.split(" ")
-				var strTemp = strDate + " " + temp[0]
 				var numGuests = document.getElementById("num_guests");
+				var strTemp = strDate + " " + numGuests;
 				var strNum = numGuests.value;
 				var strTemp = 13
-				xmlhttp.open("GET", "table.php?q=" + strNum, true);
+				xmlhttp.open("GET", "table.php?q=" + strDate, true); // this is q send to table.php 
 				xmlhttp.send();
 			}
 		}
 		</script>
-		
-	
-        <br><br>
-        <div class="container">
-        <h3 class="text-center"><br>New Reservation<br></h3>   
-        <div class="row">
-        <div class="col-md-6 offset-md-3"> 
+
+        <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Untitled Document</title>
+        <!-- Bootstrap -->
+	    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+	    <link href="style.css" rel="stylesheet" type="text/css">
+	 
     </head> 
     
     <body>
-        <div class="signup-form">
-            <form action="reservation.php" method="post">
-            
-            <div class="form-group">
-                <label>First Name</label>
-                <input type="text" class="form-control" name="name" placeholder="Name" required="required">
-                <small class="form-text text-muted">Name must be 2-20 characters long</small>
-            </div> 
-            
-            <div class="form-group">
-                <label>Enter Date</label>
-                <input type="date" class="form-control" name="date" id="date" placeholder="Date" required="required" onchange="showHint()">
-            </div>
-        
-            <div class="form-group">
-                <label>Enter Time Zone</label>
-                <select class="form-control" name="time" id="time" onchange="showHint()">
-                <option>16:00 - 17:00</option>
-                <option>17:00 - 18:00</option>
-                <option>18:00 - 19:00</option>
-                <option>19:00 - 20:00</option>
-                <option>20:00 - 21:00</option>
-                <option>21:00 - 22:00</option>
-                </select>
-            </div>
-			
-			<div> 
-				Available Seats: <span id="txtSeat"></span>
-			</div>
-        
-            <div class="form-group">
-                <label>Enter number of Guests</label>
-                <input type="number" class="form-control" min="1" name="num_guests" id="num_guests" placeholder="Guests" required="required" onchange="showHint()">
-                <small class="form-text text-muted">Minimum value is 1</small>
-            </div>
-        
-            <div class="form-group">
-                <label for="guests">Enter your Telephone Number</label>
-                <input type="telephone" class="form-control" name="tele" placeholder="Telephone" required="required">
-                <small class="form-text text-muted">Telephone must be 6-20 characters long</small>
-            </div>
-        
-            <div class="form-group">
-                <label for="email">Enter your Email</label>
-                <input type="email" class="form-control" name="email" placeholder="email" required="required">
-                <small class="form-text text-muted">Email should have @</small>
-            </div>        
-        
-            <div class="form-group">
-                <label class="checkbox-inline"><input type="checkbox" required="required"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
-            </div>
-            
-            <div class="form-group">
-                <button type="submit" name="reserv-submit" class="btn btn-dark btn-lg btn-block">Submit Reservation</button>
-            </div>
-            <p> Choose the table <a href="table.php">choose your table</a></p>
-            </form>
-            <br><br>
+    <script src="js/jquery-3.4.1.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/popper.min.js"></script> 
+<div class="container-fluid">
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> <a class="navbar-brand" href="#"><img src="images/logo.jpg" width="250" height="150" alt=""/></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent1" aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent1">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active"> <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a> </li>
+          <li class="nav-item active"> <a class="nav-link" href="menu.php">Menu <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active"> <a class="nav-link" href="reservations.php">Book A Table <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active"> <a class="nav-link" href="catering.php">Private Events <span class="sr-only">(current)</span></a></li>
+            <li class="nav-item active"> <a class="nav-link" href="signup.php">Sign up <span class="sr-only">(current)</span></a></li>
+            <li class="nav-item active"> <a class="nav-link" href="login.php">Log In<span class="sr-only">(current)</span></a></li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+        </form>
+      </div>
+    </nav>
+    <div id="carouselExampleIndicators1" class="carousel slide" data-ride="carousel" style="background-color: grey">
+      <ol class="carousel-indicators">
+        <li data-target="#carouselExampleIndicators1" data-slide-to="0" class="active"></li>
+        <li data-target="#carouselExampleIndicators1" data-slide-to="1"></li>
+        <li data-target="#carouselExampleIndicators1" data-slide-to="2"></li>
+      </ol>
+      <div class="carousel-inner" role="listbox">
+        <div class="carousel-item active"> <img src="images/1.jpg" alt="First slide" class="d-block mx-auto">
+          <div class="carousel-caption">
+          </div>
         </div>
-    </body>
+        <div class="carousel-item"> <img class="d-block mx-auto" src="images/2.jpg" alt="Second slide">
+          <div class="carousel-caption">
+          </div>
+        </div>
+        <div class="carousel-item"> <img class="d-block mx-auto" src="images/3.jpg" alt="Third slide">
+          <div class="carousel-caption">
+          </div>
+        </div>
+          <div class="carousel-item"> <img class="d-block mx-auto" src="images/4.jpg" alt="Second slide">
+          <div class="carousel-caption">
+          </div>
+        </div>
+      </div>
+      <a class="carousel-control-prev" href="#carouselExampleIndicators1" role="button" data-slide="prev"> <span class="carousel-control-prev-icon" aria-hidden="true"></span> <span class="sr-only">Previous</span> </a> <a class="carousel-control-next" href="#carouselExampleIndicators1" role="button" data-slide="next"> <span class="carousel-control-next-icon" aria-hidden="true"></span> <span class="sr-only">Next</span> </a> </div>
+    <h1 class="text-center">&nbsp;</h1>
+    <h1 class="text-center">Reserve Your Table</h1>
+    <p class="text-center">&nbsp;</p>
+
+          <center>
+
+        <form action="" method="POST">
+        
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="form-control" name="name" placeholder="Name" id="name" required="required">
+            <small class="form-text text-muted">Name must be 2-20 characters long</small>
+        </div> 
+        
+        <div class="form-group">
+    
+            <label>Enter Date</label>
+            <input type="date" class="form-control" name="date" id ="date" placeholder="Date" required="required" onchange="showHint()">
+        </div>
+
+        <div class="form-group">
+            <label>Enter Time Zone</label>
+            <select class="form-control" name="time" id="time">
+            <option>16:00 - 17:00</option>
+            <option>17:00 - 18:00</option>
+            <option>18:00 - 19:00</option>
+            <option>19:00 - 20:00</option>
+            <option>20:00 - 21:00</option>
+            <option>21:00 - 22:00</option>
+            </select>
+        </div>
+		
+		<div> 
+			Available Seats: <span id="txtSeat"></span>
+		</div>
+    
+        <div class="form-group">
+            <label>Enter number of Guests</label>
+            <input type="number" class="form-control" min="1" name="num_guests" id ="num_guests" placeholder="Guests" required="required" onchange="showHint()">
+            <small class="form-text text-muted">Minimum value is 1</small>
+        </div>
+        
+        
+
+    
+        <div class="form-group">
+            <label for="guests">Enter your Telephone Number</label>
+            <input type="telephone" class="form-control" name="tele" placeholder="Telephone" id = "tele" required="required">
+            <small class="form-text text-muted">Telephone must be 6-20 characters long</small>
+        </div>
+    
+        <div class="form-group">
+            <label for="email">Enter your Email</label>
+            <input type="email" class="form-control" name="email" placeholder="email" id ="email" required="required">
+            <small class="form-text text-muted">Email should have @.com </small>
+        </div> 	
+
+        <div class="form-group">
+            <label class="checkbox-inline"><input type="checkbox" required="required"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
+        </div>
+        
+        <div class="form-group">
+             
+        <input type="submit" name="reserv-submit" class="btn btn-dark btn-lg btn-block" class="form-control">Submit Reservation</button>
+    
+        </div>
+        
+       
+      
+        </form>
+        <br><br>
+    </div>
+
+    </center>
+
+
+
+
+    
+</div>
+      <br>
+      <br>
+      <br>
+<footer>
+<div class="row">
+<div class="col-xl-6">"This is where the logo goes"</div>
+<div class="col-xl-6">Copyright © 2021  All Rights Reserved.</div>
+</div>
+</footer>
+  </div>
+</div>
+<script src="js/bootstrap-4.4.1.js"></script>
+</body>
 </html>

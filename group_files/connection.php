@@ -1,5 +1,4 @@
 <?php
-
 /*
 
 CREATE TABLE users (
@@ -84,6 +83,39 @@ LIMIT row_count OFFSET offset;
 	}
 	//$db = new SQLite3('reservation.db');
 	
+	function resetDb() {
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+		$statement = $db->prepare("DELETE FROM users");
+		$result = $statement->execute();
+		$statement = $db->prepare("DELETE FROM reservations");
+		$result = $statement->execute();
+		$statement = $db->prepare("DELETE FROM tables");
+		$result = $statement->execute();
+		$statement = $db->prepare("DELETE FROM high_traffic_days");
+		$result = $statement->execute();
+		$statement = $db->prepare("INSERT INTO users (preferred_diner_id, name, mailing_address, billing_address, points, payment_method, email, username, password)
+VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
+		$result = $statement->execute();
+		insertHighTrafficDays('2021-01-01', 'New Year’s Day');
+		insertHighTrafficDays('2021-01-18', 'Martin Luther King, Jr. Day');
+		insertHighTrafficDays('2021-02-15', 'President’s Day');
+		insertHighTrafficDays('2021-05-31', 'Memorial Day');
+		insertHighTrafficDays('2021-06-18', 'Juneteenth');
+		insertHighTrafficDays('2021-06-19', 'Juneteenth');
+		insertHighTrafficDays('2021-07-04', 'Independence Day');
+		insertHighTrafficDays('2021-09-05', 'Labor Day');
+		insertHighTrafficDays('2021-10-10', 'Columbus Day');
+		insertHighTrafficDays('2021-11-11', 'Veterans Day');
+		insertHighTrafficDays('2021-11-24', 'Thanksgiving Day');
+		insertHighTrafficDays('2021-12-25', 'Christmas Eve');
+		insertHighTrafficDays('2021-12-26', 'Christmas Day');
+		insertHighTrafficDays('2021-12-31', 'New Year’s Eve');
+		$db->close();
+	}
+	
 	function insertUser($name, $mailing, $billing, $points, $payment, $email, $username, $password) {	
 		$db = new MyDB();
 		if (!$db) {
@@ -122,11 +154,88 @@ LIMIT row_count OFFSET offset;
 		$statement->bindValue(':phone_num', $phone_num);
 		$statement->bindValue(':email', $email);
 		$statement->bindValue(':num_of_guests', $num_of_guests);
-		$statement->bindValue(':tables', $tables);
+		//$statement->bindValue(':tables', $tables);
+		$statement->bindValue(':tables', getReservationSeatsStr($num_of_guests, $date));
 		$statement->bindValue(':payment_method', $payment_method);
 	
 		$result = $statement->execute();
 		$db->close();
+	}
+	
+	function getReservationSeatsStr($num_of_guests, $date) {
+		$strSeats = "";
+		
+		$tables = array(
+			2 => 10,
+			4 => 5,
+			6 => 4
+		);
+		
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+
+		for ($i = 1; $i <= 3; $i++) {
+			$statement = $db->prepare("SELECT tables as taken FROM reservations WHERE date LIKE :date and tables LIKE :tables");
+			$temp = '%' . $date . '%';
+			$tempNum = $i*2;
+			$tempNumStr = '%' . $tempNum . '%';
+			$statement->bindValue(':date', $temp);
+			$statement->bindValue(':tables', $tempNumStr);
+			$result = $statement->execute();
+			
+			$numOfTakenTables = 0;
+			
+			while($row = $result->fetchArray()) { 
+				if (strlen($row['taken']) > 1) {
+					$split = explode("+", $row['taken']);
+					for ($j = 0; $j < count($split); $j++) {
+						if ($split[$j] == $tempNum) {
+							$numOfTakenTables += 1;
+						}
+					}
+				} else {
+					if ($row['taken'] == $tempNum) {
+						$numOfTakenTables += 1;
+					}
+				}
+			}
+			$tables[$tempNum] -= $numOfTakenTables;
+			//echo $numOfTakenTables;
+		}
+		
+		$db->close();
+
+		if ($num_of_guests >= 5 && $tables[6] > 0) {
+			$strSeats = "6";
+			$num_of_guests = $num_of_guests-6;
+		} elseif ($num_of_guests >= 3 && $tables[4] > 0) {
+			$strSeats = "4";
+			$num_of_guests = $num_of_guests-6;
+		} elseif ($num_of_guests > 0 && $tables[2] > 0) {
+			$strSeats = "2";
+			$num_of_guests = $num_of_guests-6;
+		} else {
+			$strSeats = "Error";
+		}
+
+		while ($num_of_guests > 0) {
+			if ($num_of_guests >= 5 && $tables[6] > 0) {
+				$strSeats .= "+6";
+				$num_of_guests = $num_of_guests-6;
+			} elseif ($num_of_guests >= 3 && $tables[4] > 0) {
+				$strSeats .= "+4";
+				$num_of_guests = $num_of_guests-6;
+			} elseif ($num_of_guests > 0 && $tables[2] > 0) {
+				$strSeats .= "+2";
+				$num_of_guests = $num_of_guests-6;
+			} else {
+				$strSeats = "Error";
+			}
+		}
+		
+		return $strSeats;
 	}
 	
 	function insertTables($table_id, $num_of_seats) {	
@@ -173,8 +282,10 @@ LIMIT row_count OFFSET offset;
 		$statement->bindValue(':password', $password);
 		
 		$result = $statement->execute();
+		
+		$temp = emptyResult($result);
 		$db->close();
-		return $result;
+		return $temp;
 	}
 	
 	//Returns true if $result is empty.
@@ -206,27 +317,42 @@ LIMIT row_count OFFSET offset;
 			return true;
 		}
 	}
+
 	
-	/*$db = new MyDB();
-	if (!$db) {
-		echo $db -> lastErrorMsg();
-	}
-	$statement = $db->prepare("SELECT * FROM users");
-	$result = $statement->execute();
 	
-	if (emptyResult($result)) {
-		echo "empty\n";
-	} else {
-		echo "not empty \n";
-	}
-	
+	/*
 	if (doesUserExist('Guest')) {
 		echo "Exists \n";
 	} else {
 		echo "Does not exist\n";
 	}
-		
-	while($row = $result->fetchArray()) {
+	*/
+
+/*	$db = new MyDB();
+	if (!$db) {
+		echo $db -> lastErrorMsg();
+	}
+
+	$statement = $db->prepare("SELECT * FROM reservations");
+	$result = $statement->execute();
+
+
+	while($row = $result->fetchArray()) {   	// for reservation
+		header('Content-type: text/plain');
+		echo "preferred_diner_id = ". $row['preferred_diner_id'] . "\n";
+		echo "date = ". $row['date'] ."\n";
+		echo "time = ".$row['time'] ."\n";
+		echo "name = ". $row['name'] ."\n";
+		echo "phone number = ". $row['phone_num'] . "\n";
+		echo "email = ". $row['email'] ."\n";
+		echo "number of guest = ". $row['num_of_guests'] ."\n";
+		echo "tables = ".$row['tables'] ."\n";
+		echo "payment  = ".$row['payment_method'] ."\n\n";
+	 }
+
+
+
+	/* while($row = $result->fetchArray()) {
 	  header('Content-type: text/plain');
       echo "preferred_diner_id = ". $row['preferred_diner_id'] . "\n";
       echo "name = ". $row['name'] ."\n";
@@ -237,12 +363,13 @@ LIMIT row_count OFFSET offset;
       echo "email = ". $row['email'] ."\n";
       echo "username = ".$row['username'] ."\n";
 	  echo "password = ".$row['password'] ."\n\n";
-   }*/
+   }
 	
+
 	/*$statement = $db->prepare("DELETE FROM users WHERE preferred_diner_id = 1");
-	$result = $statement->execute();*/
+	$result = $statement->execute();
 	
-	//$db->close();
+	$db->close();*/
 
 ?>
 
