@@ -102,6 +102,7 @@ function check($date)
 			$_SESSION['num_guests'] = $_POST['num_guests'];
 			$_SESSION['tele'] = $_POST['tele'];
 			$_SESSION['email'] = $_POST['email'];
+			$avaiableSeats = getRemainingSeats($date);
 			
 			if (intval($guests) < intval($avaiableSeats)) {
 				header("Location:hightraffic.php");
