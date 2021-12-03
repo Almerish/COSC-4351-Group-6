@@ -54,7 +54,7 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
     
 }
 
-if(array_key_exists('reserv-submit', $_POST)) 
+if(array_key_exists('date', $_POST)) 
 {
   check($_POST['date']);
 }
@@ -71,14 +71,18 @@ function check($date)
         $result = $statement->execute();
     
         if (emptyResult($result)) {
+          
+          header("Location:index.php");
 
-          $var = "not high traffic date";       //var stores the value but how to link it still not get it
+          $var = "0";       //var stores the value but how to link it still not get it
           $_SESSION["var2"] = $var;
           echo $var;                  
         } 
         else 
         {
-          $var = "high traffic date"; 
+          header("Location:hightraffic.php");
+
+          $var = "1";  //high traffic 
           $_SESSION["var2"] = $var;
           echo $var;
         }
@@ -181,7 +185,7 @@ function check($date)
 
           <center>
 
-        <form method="POST" action="hightraffic.php">
+        <form method="POST">
         
         <div class="form-group">
             <label>First Name</label>
