@@ -25,6 +25,7 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
     $guests= $_POST['num_guests'];
     $tele = $_POST['tele'];
     $email = $_POST['email'];
+	$avaiableSeats = getRemainingSeats($date);
     
   
     if(empty($name) || empty($date) || empty($time) || empty($guests) || empty($tele) ||empty($email))
@@ -41,6 +42,10 @@ if(isset($_POST['reserv-submit']))  //use button name = reserv-submit in html do
     {
         $guests_error = "please enter number of guest";
     }
+	
+	elseif(intval($guests) > intval($avaiableSeats)){
+		$guests_error = "too many guests for choosen date";
+	}
 
     elseif(!preg_match("/^[a-zA-Z0-9]*$/", $tele) || !between($tele,6,20))
     {
@@ -153,7 +158,7 @@ function check($date)
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active"> <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a> </li>
           <li class="nav-item active"> <a class="nav-link" href="menu.php">Menu <span class="sr-only">(current)</span></a></li>
-          <li class="nav-item active"> <a class="nav-link" href="reservation.php">Book A Table <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active"> <a class="nav-link" href="reservations.php">Book A Table <span class="sr-only">(current)</span></a></li>
           <li class="nav-item active"> <a class="nav-link" href="catering.php">Private Events <span class="sr-only">(current)</span></a></li>
             <li class="nav-item active"> <a class="nav-link" href="signup.php">Sign up <span class="sr-only">(current)</span></a></li>
             <li class="nav-item active"> <a class="nav-link" href="login.php">Log In<span class="sr-only">(current)</span></a></li>
