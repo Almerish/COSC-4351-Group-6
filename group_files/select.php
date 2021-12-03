@@ -3,6 +3,8 @@ require_once "connection.php";
 
 //resetDb();
 
+echo getRemainingSeats('2021-12-25');
+
 $db = new MyDB();
 if (!$db) {
 	echo $db -> lastErrorMsg();

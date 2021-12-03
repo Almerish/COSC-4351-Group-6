@@ -162,9 +162,7 @@ VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
 		$db->close();
 	}
 	
-	function getReservationSeatsStr($num_of_guests, $date) {
-		$strSeats = "";
-		
+	function getRemainingSeats($date) {
 		$tables = array(
 			2 => 10,
 			4 => 5,
@@ -204,32 +202,93 @@ VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
 			$tables[$tempNum] -= $numOfTakenTables;
 			//echo $numOfTakenTables;
 		}
+		$currentCapacity = 0;
+
+		for ($i = 1; $i <= 3; $i++) {
+			$tempNum = $i*2;
+			//echo $tables[$tempNum];
+			//echo " ";
+			$currentCapacity += ($tempNum * $tables[$tempNum]);
+		}
+
+		return $currentCapacity;
+		
+	}
+	
+	function getReservationSeatsStr($num_of_guests, $date) {
+		$strSeats = "";
+		
+		$tablesAry = array(
+			2 => 10,
+			4 => 5,
+			6 => 4
+		);
+		
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+
+		for ($i = 1; $i <= 3; $i++) {
+			$statement = $db->prepare("SELECT tables as taken FROM reservations WHERE date LIKE :date and tables LIKE :tables");
+			$temp = '%' . $date . '%';
+			$tempNum = $i*2;
+			$tempNumStr = '%' . $tempNum . '%';
+			$statement->bindValue(':date', $temp);
+			$statement->bindValue(':tables', $tempNumStr);
+			$result = $statement->execute();
+			
+			$numOfTakenTables = 0;
+			
+			while($row = $result->fetchArray()) { 
+				if (strlen($row['taken']) > 1) {
+					$split = explode("+", $row['taken']);
+					for ($j = 0; $j < count($split); $j++) {
+						if ($split[$j] == $tempNum) {
+							$numOfTakenTables += 1;
+						}
+					}
+				} else {
+					if ($row['taken'] == $tempNum) {
+						$numOfTakenTables += 1;
+					}
+				}
+			}
+			$tablesAry[$tempNum] -= $numOfTakenTables;
+		}
 		
 		$db->close();
 
-		if ($num_of_guests >= 5 && $tables[6] > 0) {
+		if ($num_of_guests >= 5 && intval($tablesAry[6]) > 0) {
 			$strSeats = "6";
 			$num_of_guests = $num_of_guests-6;
-		} elseif ($num_of_guests >= 3 && $tables[4] > 0) {
+			$tablesAry[6] -= $numOfTakenTables;
+		} else if ($num_of_guests >= 3 && $tablesAry[4] > 0) {
 			$strSeats = "4";
 			$num_of_guests = $num_of_guests-6;
-		} elseif ($num_of_guests > 0 && $tables[2] > 0) {
+			$tablesAry[4] -= $numOfTakenTables;
+		} else if ($num_of_guests > 0 && $tablesAry[2] > 0) {
 			$strSeats = "2";
 			$num_of_guests = $num_of_guests-6;
+			$tablesAry[2] -= $numOfTakenTables;
 		} else {
 			$strSeats = "Error";
 		}
+		
 
 		while ($num_of_guests > 0) {
-			if ($num_of_guests >= 5 && $tables[6] > 0) {
+			if ($num_of_guests >= 5 && intval($tablesAry[6]) > 0) {
 				$strSeats .= "+6";
 				$num_of_guests = $num_of_guests-6;
-			} elseif ($num_of_guests >= 3 && $tables[4] > 0) {
+				$tablesAry[6] -= $numOfTakenTables;
+			} else if ($num_of_guests >= 3 && $tablesAry[4] > 0) {
 				$strSeats .= "+4";
 				$num_of_guests = $num_of_guests-6;
-			} elseif ($num_of_guests > 0 && $tables[2] > 0) {
+				$tablesAry[4] -= $numOfTakenTables;
+			} else if ($num_of_guests > 0 && $tablesAry[2] > 0) {
 				$strSeats .= "+2";
 				$num_of_guests = $num_of_guests-6;
+				$tablesAry[2] -= $numOfTakenTables;
 			} else {
 				$strSeats = "Error";
 			}

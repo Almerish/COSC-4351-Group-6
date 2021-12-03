@@ -1,6 +1,7 @@
 <?php
   
 // Initialize the session
+require "connection.php";
 session_start();
        
 // Store the submitted data sent
@@ -16,12 +17,12 @@ if(isset($_SESSION['var']))      // we have set id and username to Session varia
 }
   
 // Temporarily in $_POST structure.
-$_SESSION['name'] = $_POST['name'];                 // all this information is stored from previous page 
+/*$_SESSION['name'] = $_POST['name'];                 // all this information is stored from previous page 
 $_SESSION['date'] = $_POST['date'];
 $_SESSION['time'] = $_POST['time'];
 $_SESSION['num_guests'] = $_POST['num_guests'];
 $_SESSION['tele'] = $_POST['tele'];
-$_SESSION['email'] = $_POST['email'];
+$_SESSION['email'] = $_POST['email'];*/
 
 
 $all_error = $cardtype_error = $cardno_error = $cvv_error = $expdate_error = ""; 
@@ -53,6 +54,11 @@ if(isset($_POST['final-submit']))  //use button name = reserv-submit in html doc
     {
         $expdate_error = "please enter valid expiration date";
     }
+	
+	if(empty($cardno_error) && empty($cvv_error) && empty($expdate_error) && !empty($cardtype) && !empty($cardno) && !empty($cvv) && !empty($expdate)) {		
+		insertReservation(0, $_SESSION['date'], $_SESSION['time'], $_SESSION['name'], $_SESSION['tele'], $_SESSION['email'], intval($_SESSION['num_guests']), "", "Credit");
+		header("Location:index.php");
+	}
 
 ?>
 

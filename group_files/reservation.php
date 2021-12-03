@@ -83,9 +83,12 @@ function check($date)
 			$guests= $_POST['num_guests'];
 			$tele = $_POST['tele'];
 			$email = $_POST['email'];
+			$avaiableSeats = getRemainingSeats($date);
 			
-			insertReservation(0, $date, $time, $name, $tele, $email, intval($guests), "", "Cash");
-          header("Location:index.php");
+			if (intval($guests) < intval($avaiableSeats)) {
+				insertReservation(0, $date, $time, $name, $tele, $email, intval($guests), "", "Cash");
+				header("Location:index.php");
+			}
 
           $var = "0";       //var stores the value but how to link it still not get it
           $_SESSION["var2"] = $var;
@@ -93,7 +96,16 @@ function check($date)
         } 
         else 
         {
-          header("Location:hightraffic.php");
+			$_SESSION['name'] = $_POST['name'];                 // all this information is stored from previous page 
+			$_SESSION['date'] = $_POST['date'];
+			$_SESSION['time'] = $_POST['time'];
+			$_SESSION['num_guests'] = $_POST['num_guests'];
+			$_SESSION['tele'] = $_POST['tele'];
+			$_SESSION['email'] = $_POST['email'];
+			
+			if (intval($guests) < intval($avaiableSeats)) {
+				header("Location:hightraffic.php");
+			}
 
           $var = "1";  //high traffic 
           $_SESSION["var2"] = $var;
@@ -158,7 +170,7 @@ function check($date)
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active"> <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a> </li>
           <li class="nav-item active"> <a class="nav-link" href="menu.php">Menu <span class="sr-only">(current)</span></a></li>
-          <li class="nav-item active"> <a class="nav-link" href="reservations.php">Book A Table <span class="sr-only">(current)</span></a></li>
+          <li class="nav-item active"> <a class="nav-link" href="reservation.php">Book A Table <span class="sr-only">(current)</span></a></li>
           <li class="nav-item active"> <a class="nav-link" href="catering.php">Private Events <span class="sr-only">(current)</span></a></li>
             <li class="nav-item active"> <a class="nav-link" href="signup.php">Sign up <span class="sr-only">(current)</span></a></li>
             <li class="nav-item active"> <a class="nav-link" href="login.php">Log In<span class="sr-only">(current)</span></a></li>
