@@ -9,6 +9,11 @@ if(isset($_SESSION['id']))      // we have set id and username to Session variab
 {
     echo '<p class="text-white bg-dark text-center">Welcome '. $_SESSION['name'] .', Enter the card details here!</p>';
 }
+
+if(isset($_SESSION['var']))      // we have set id and username to Session variable   //isset will check if the variable is not null
+{
+    echo '<p class="text-white bg-dark text-center">Welcome '. $_SESSION['var'] .', Enter details</p>';
+}
   
 // Temporarily in $_POST structure.
 $_SESSION['name'] = $_POST['name'];                 // all this information is stored from previous page 

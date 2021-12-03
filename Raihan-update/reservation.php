@@ -73,13 +73,13 @@ function check($date)
         if (emptyResult($result)) {
 
           $var = "not high traffic date";       //var stores the value but how to link it still not get it
-          $_SESSION['var2'] = $var;
+          $_SESSION["var2"] = $var;
           echo $var;                  
         } 
         else 
         {
           $var = "high traffic date"; 
-          $_SESSION['var2'] = $var;
+          $_SESSION["var2"] = $var;
           echo $var;
         }
         $db->close();
