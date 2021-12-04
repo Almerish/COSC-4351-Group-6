@@ -1,4 +1,4 @@
-# COSC-4351-Group-4
+# COSC-4351-Group-6
 Group project for COSC 4351
 
 How to run:
