@@ -23,4 +23,4 @@ Stephany,
 Nicholas <br>
 
 Project:
-Website for group 4 project in cosc 4351 <br>
+Website for group 6 project in cosc 4351 <br>
