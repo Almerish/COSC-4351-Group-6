@@ -3,7 +3,7 @@ Group project for COSC 4351
 
 How to run:
 Download the proper version of XAMPP in order to be run on your system at [XAMPP](https://www.apachefriends.org/index.html) <br>
-Note down your install folder location and navigate to the htdocs inside of the installation folder (ie for me A:\xampp\htdocs) <br>
+Note down your install folder location it will be named Xampp and navigate to the htdocs inside of the installation folder (ie for me A:\xampp\htdocs) <br>
 
 ![Screenshot](xampp2.PNG)
 
