@@ -2,7 +2,20 @@
 Group project for COSC 4351
 
 How to run:
+Download the proper version of XAMPP in order to be run on your system at [XAMPP](https://www.apachefriends.org/index.html)
+Note down your install folder location and navigate to the htdocs inside of the installation folder (ie for me A:\xampp\htdocs)
+
+![Screenshot](xampp2.PNG)
+
+Once inside this folder download the Final folder from this github repo and place it inside of the gtdocs folder.
+Once the folder has been place start XAMPP. Once the application has started select start for the Apache module.
+
 ![Screenshot](xampp.PNG)
+
+Now that the module is running you can open your web browser and go to localhost/Final/index.php
+If you wish to view the database go to localhost/Final/select.php
+
+![Screenshot](xampp3.PNG)
 
 Group members:
 Mohammed,
