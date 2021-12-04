@@ -2,7 +2,7 @@
 Group project for COSC 4351
 
 How to run:
-![Screenshot](xampp.png)
+![Screenshot](xampp.PNG)
 
 Group members:
 Mohammed,
