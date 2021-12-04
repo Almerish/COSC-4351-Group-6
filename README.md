@@ -7,7 +7,7 @@ Note down your install folder location it will be named Xampp and navigate to th
 
 ![Screenshot](xampp2.PNG)
 
-Once inside this folder download the Final folder from this github repo and place it inside of the gtdocs folder. <br>
+Once inside xampp -> htdocs folder download the "Final" folder from our github repo and place it inside of the htdocs folder. <br>
 Once the folder has been place start XAMPP. Once the application has started select start for the Apache module. <br>
 
 ![Screenshot](xampp.PNG)
@@ -18,9 +18,9 @@ If you wish to view the database go to localhost/Final/select.php <br>
 ![Screenshot](xampp3.PNG)
 
 Group members:
-Mohammed,
-Stephany,
-Nicholas <br>
+Mohammed raihan kapadia,
+Stephany Monroy,
+Nicholas moore <br>
 
 Project:
 Website for group 6 project in cosc 4351 <br>
