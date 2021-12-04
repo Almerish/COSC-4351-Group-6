@@ -263,11 +263,11 @@ VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
 			$strSeats = "6";
 			$num_of_guests = $num_of_guests-6;
 			$tablesAry[6] -= $numOfTakenTables;
-		} else if ($num_of_guests >= 3 && $tablesAry[4] > 0) {
+		} elseif ($num_of_guests >= 3 && $tablesAry[4] > 0) {
 			$strSeats = "4";
 			$num_of_guests = $num_of_guests-6;
 			$tablesAry[4] -= $numOfTakenTables;
-		} else if ($num_of_guests > 0 && $tablesAry[2] > 0) {
+		} elseif ($num_of_guests > 0 && $tablesAry[2] > 0) {
 			$strSeats = "2";
 			$num_of_guests = $num_of_guests-6;
 			$tablesAry[2] -= $numOfTakenTables;
@@ -281,11 +281,11 @@ VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
 				$strSeats .= "+6";
 				$num_of_guests = $num_of_guests-6;
 				$tablesAry[6] -= $numOfTakenTables;
-			} else if ($num_of_guests >= 3 && $tablesAry[4] > 0) {
+			} elseif ($num_of_guests >= 3 && $tablesAry[4] > 0) {
 				$strSeats .= "+4";
 				$num_of_guests = $num_of_guests-6;
 				$tablesAry[4] -= $numOfTakenTables;
-			} else if ($num_of_guests > 0 && $tablesAry[2] > 0) {
+			} elseif ($num_of_guests > 0 && $tablesAry[2] > 0) {
 				$strSeats .= "+2";
 				$num_of_guests = $num_of_guests-6;
 				$tablesAry[2] -= $numOfTakenTables;
@@ -344,6 +344,74 @@ VALUES (0, 'Guest', 'Guest', 'Guest', 0, 'Guest', 'Guest', 'Guest', 'Guest');");
 		
 		$temp = emptyResult($result);
 		$db->close();
+		return $temp;
+	}
+	
+	function getUserPassword($username, $password) {
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+		
+		$statement = $db->prepare("SELECT password FROM users WHERE username = :username");
+		$statement->bindValue(':username', $username);
+		$result = $statement->execute();
+		
+		while($row = $result->fetchArray()) { 
+			$temp = $row['password'];
+		}
+		
+		$verify = password_verify($password, $temp);
+		
+		if ($verify) {
+			return true;
+		} else {
+			echo false;
+		}
+		
+		
+	}
+	
+	function getUserId($username) {
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+		
+		$statement = $db->prepare("SELECT preferred_diner_id FROM users WHERE username = :username");
+		$statement->bindValue(':username', $username);
+		$result = $statement->execute();
+		
+		if (emptyResult($result)) {
+			$temp = 0;
+		} else {
+			while($row = $result->fetchArray()) { 
+				$temp = $row['preferred_diner_id'];
+			}	
+		}
+		
+		return $temp;
+		
+	}
+	
+	function getUserPayment($id) {
+		$db = new MyDB();
+		if (!$db) {
+			echo $db -> lastErrorMsg();
+		}
+		
+		$statement = $db->prepare("SELECT payment_method FROM users WHERE preferred_diner_id = :preferred_diner_id");
+		$statement->bindValue(':preferred_diner_id', $id);
+		$result = $statement->execute();
+		
+		if (emptyResult($result)) {
+			$temp = 0;
+		} else {
+			while($row = $result->fetchArray()) { 
+				$temp = $row['payment_method'];
+			}	
+		}
+		
 		return $temp;
 	}
 	

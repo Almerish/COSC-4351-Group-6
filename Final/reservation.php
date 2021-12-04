@@ -3,10 +3,10 @@
 require "connection.php";
 session_start();
 
-if(isset($_SESSION['id']))      // we have set id and username to Session variable   //isset will check if the variable is not null
-{
-    echo '<p class="text-white bg-dark text-center">Welcome '. $_SESSION['username'] .', Create your reservation here!</p>';
-}
+//if(isset($_SESSION['id']))      // we have set id and username to Session variable   //isset will check if the variable is not null
+//{
+//    echo '<p class="text-white bg-dark text-center">Welcome '. $_SESSION['username'] .', Create your reservation here!</p>';
+//}
 
 function between($val, $x, $y)      // function to decide the value is correct or not
 {
@@ -84,9 +84,16 @@ function check($date)
 			$tele = $_POST['tele'];
 			$email = $_POST['email'];
 			$avaiableSeats = getRemainingSeats($date);
+			$id = 0;
+			$payment_meth = 'Cash';
+			
+			if ($_SESSION["loggedin"] == true) {
+				$id = $_SESSION["id"];
+				$payment_meth = getUserPayment($id);
+			}
 			
 			if (intval($guests) < intval($avaiableSeats)) {
-				insertReservation(0, $date, $time, $name, $tele, $email, intval($guests), "", "Cash");
+				insertReservation($id, $date, $time, $name, $tele, $email, intval($guests), "", $payment_meth);
 				header("Location:index.php");
 			}
 

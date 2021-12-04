@@ -96,7 +96,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 
 	// eneter data in database is remaining
 	if (empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($mailing_address_err) && empty($billing_address_err) && empty($email_err)) {
-		insertUser($username, $mailing_address, $billing_address, 0, trim($_POST["payment"]), $email, $username, $password);
+		$hash = password_hash($password, PASSWORD_DEFAULT);
+		insertUser($username, $mailing_address, $billing_address, 0, trim($_POST["payment"]), $email, $username, $hash);
 		header("Location:index.php");
 	}
 }

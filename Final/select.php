@@ -3,8 +3,6 @@ require_once "connection.php";
 
 //resetDb();
 
-echo getRemainingSeats('2021-12-25');
-
 $db = new MyDB();
 if (!$db) {
 	echo $db -> lastErrorMsg();
@@ -50,6 +48,7 @@ echo '  border-collapse: collapse;}';
 echo '</style>';
 echo '<table>';
 echo '<tr>';
+echo '  <th>reservation_id </th>';
 echo '  <th>preferred_diner_id </th>';
 echo '  <th>date </th>';
 echo '  <th>time </th>';
@@ -61,7 +60,7 @@ echo '  <th>tables </th>';
 echo '  <th>payment_method </th>';
 echo '</tr>';  
 while($row = $result->fetchArray()) {   	// for reservation
-	echo '<tr><td>' . $row['preferred_diner_id'] . '</td><td>' . $row['date'] . '</td>' . '<td>' . $row['time'] . '</td><td>' . $row['name'] . '</td>' . '<td>' . $row['phone_num'] . '</td><td>' . $row['email'] . '</td>' . '<td>' . $row['num_of_guests'] . '</td><td>' . $row['tables'] . '</td>' . '<td>' . $row['payment_method'] . '</td>';
+	echo '<tr><td>' . $row['reservation_id'] . '</td><td>' . $row['preferred_diner_id'] . '</td><td>' . $row['date'] . '</td>' . '<td>' . $row['time'] . '</td><td>' . $row['name'] . '</td>' . '<td>' . $row['phone_num'] . '</td><td>' . $row['email'] . '</td>' . '<td>' . $row['num_of_guests'] . '</td><td>' . $row['tables'] . '</td>' . '<td>' . $row['payment_method'] . '</td>';
 }
 echo '</table>';
 echo('</p>');

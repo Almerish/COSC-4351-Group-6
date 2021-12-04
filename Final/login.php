@@ -27,13 +27,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 	// eneter data in database is remaining
 	if (empty($username_err) && empty($password_err)) {
 		
-		if (getUser($username, $password)) {
-			$username_err = "Invalid Username or Password";
-			$password_err = "Invalid Username or Password."; 
-		} else {
+		if (getUserPassword($username, $password)) {
 			$_SESSION["loggedin"] = true;
 			$_SESSION["username"] = $username;  
+			$_SESSION["id"] = getUserId($username); 
+			$_SESSION["payment"] = getUserPayment(getUserId($username)); 
 			header("Location:index.php");
+		} else {
+			$username_err = "Invalid Username or Password";
+			$password_err = "Invalid Username or Password."; 
 		}
 	}
 }
